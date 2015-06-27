@@ -1,20 +1,25 @@
 package main
+
 import (
 	"code.google.com/p/rsc/qr"
-	"os"
-	"log"
 	"io/ioutil"
+	"log"
+	"os"
 )
 
 func main() {
-	src := os.Args[1]
-	if len(src) < 1 {
+	var src, dst string
+	switch len(os.Args) {
+	case 1:
 		log.Fatal("Source string must be given!")
-	}
-
-	dst := os.Args[2]
-	if len(dst) < 1 {
+	case 2:
+		src = os.Args[1]
 		dst = "qr.png"
+	case 3:
+		src = os.Args[1]
+		dst = os.Args[2]
+	default:
+		log.Fatal("Invalid arguments!")
 	}
 
 	code, err := qr.Encode(src, qr.M)
