@@ -11,4 +11,6 @@ mv qrgen `your path to executables`
 ```
 
 # How to use
+```bash
 qrgen `source(string)` `destination.png(optional, default is qr.png)`
+```
