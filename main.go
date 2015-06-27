@@ -14,7 +14,7 @@ func main() {
 
 	dst := os.Args[2]
 	if len(dst) < 1 {
-		dst = "result.png"
+		dst = "qr.png"
 	}
 
 	code, err := qr.Encode(src, qr.M)
