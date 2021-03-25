@@ -1,34 +1,63 @@
 package main
 
 import (
-	"code.google.com/p/rsc/qr"
+	"golang.org/x/xerrors"
 	"io/ioutil"
 	"log"
 	"os"
+	"rsc.io/qr"
 )
 
 func main() {
-	var src, dst string
+	err := run()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func run() error {
+	var (
+		src  string
+		dst  string = "qr.png"
+		argn int    = 2 // max number of arguments
+	)
+
+	stat, err := os.Stdin.Stat()
+	if err != nil {
+		return err
+	}
+
+	if stat.Mode()&os.ModeCharDevice == 0 {
+		input, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			return err
+		}
+		src = string(input)
+		argn-- // if the input text exists, "src" argument will be not required.
+	} else {
+		if len(os.Args) < 2 {
+			return xerrors.New("The source text must be given!")
+		}
+		src = os.Args[1]
+	}
+
+	if len(src) == 0 {
+		return xerrors.New("The source text must be given!")
+	}
+
 	switch len(os.Args) {
-	case 1:
-		log.Fatal("Source string must be given!")
-	case 2:
-		src = os.Args[1]
-		dst = "qr.png"
-	case 3:
-		src = os.Args[1]
+	case argn:
+		break
+	case argn + 1:
 		dst = os.Args[2]
 	default:
-		log.Fatal("Invalid arguments!")
+		return xerrors.New("Invalid arguments!")
 	}
 
 	code, err := qr.Encode(src, qr.M)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	err = ioutil.WriteFile(dst, code.PNG(), 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
+	return ioutil.WriteFile(dst, code.PNG(), 0644)
 }
